@@ -20,21 +20,42 @@ st.title("星河电商 · DataPilot 经营分析中心")
 st.caption("6 个月可复现模拟数据｜多渠道经营｜只读分析｜事实、假设与结论严格分层")
 
 api_key = os.getenv("OPENAI_API_KEY", "")
+api_key_source = "环境变量" if api_key else ""
 model_name = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 try:
-    api_key = st.secrets.get("OPENAI_API_KEY", api_key)
+    secret_key = st.secrets.get("OPENAI_API_KEY", "")
+    if secret_key:
+        api_key = secret_key
+        api_key_source = "Streamlit Secrets"
     model_name = st.secrets.get("OPENAI_MODEL", model_name)
 except FileNotFoundError:
     pass
 
+def clear_manual_api_key():
+    st.session_state.manual_api_key = ""
+
 with st.sidebar:
     st.subheader("Agent 配置")
+    manual_api_key = st.text_input(
+        "临时填写 OpenAI API Key",
+        type="password",
+        key="manual_api_key",
+        placeholder="sk-...",
+        help="只保存在当前 Streamlit 会话内，不会写入文件、数据库或 GitHub。",
+    ).strip()
+    if manual_api_key:
+        api_key = manual_api_key
+        api_key_source = "当前会话输入"
+
     if api_key:
         query_mode = st.radio("SQL 生成方式", ["OpenAI Agent", "本地安全解析"])
-        st.success(f"API Key 已加载｜模型：{model_name}")
+        st.success(f"API Key 已加载（{api_key_source}）｜模型：{model_name}")
+        if manual_api_key:
+            st.button("清除临时 API Key", on_click=clear_manual_api_key)
     else:
         query_mode = "本地安全解析"
-        st.info("未检测到 API Key，当前使用本地安全解析。")
+        st.info("填写 API Key 后即可使用 OpenAI Agent；留空则使用本地安全解析。")
+    st.caption("安全提示：页面不会持久化或显示完整 Key。生产部署请使用环境变量或 Secrets。")
 
 st.subheader("自然语言问数")
 with st.form("nlq_form"):
