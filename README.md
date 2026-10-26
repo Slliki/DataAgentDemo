@@ -76,6 +76,14 @@ python -m streamlit run app.py
 
 不配置 API Key 也可以运行，此时使用本地安全解析。配置后可在侧边栏选择 `OpenAI Agent`。
 
+### 页面临时填写
+
+可以直接在页面左侧的“临时填写 OpenAI API Key”输入框中粘贴 Key。输入框使用密码模式，Key 仅保存在当前 Streamlit 会话内，不会写入文件、DuckDB 或 GitHub。点击“清除临时 API Key”或结束会话后失效。
+
+该方式适合本地 Demo。生产部署仍应使用环境变量或专用密钥管理服务。
+
+### 环境变量
+
 在启动 Streamlit 的同一个 PowerShell 窗口中执行：
 
 ```powershell
@@ -83,6 +91,8 @@ $env:OPENAI_API_KEY="sk-your-api-key"
 $env:OPENAI_MODEL="gpt-5-mini"
 python -m streamlit run app.py
 ```
+
+### Streamlit Secrets
 
 也可以复制 `.streamlit/secrets.toml.example` 为 `.streamlit/secrets.toml`：
 
